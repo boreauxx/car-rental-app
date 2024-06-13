@@ -280,13 +280,6 @@ public class Main {
                     .append(System.lineSeparator());
             sb.append(INVOICE_TOTAL_MESSAGE + total)
                     .append(System.lineSeparator());
-
-            System.out.println("rental cost: " + rentalCost);
-            System.out.println("initial insurance: " + initialInsurance);
-
-            System.out.println("total rent: " + fullyChargedRent);
-            System.out.println("total insurance: " + fullyChargedInsurance);
-            System.out.println("total paid: " + total);
         }
         System.out.println(sb.toString());
     }
