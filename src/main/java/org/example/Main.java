@@ -40,6 +40,26 @@ public class Main {
 
     private static final String INVALID_TYPE = "Please choose a valid vehicle type!";
 
+    private static final String INVOICE_LAYOUT = "XXXXXXXXXX";
+    private static final String INVOICE_START_MESSAGE = "Reservation start date:";
+    private static final String INVOICE_END_MESSAGE = "Reservation end date:";
+    private static final String INVOICE_RENTAL_DAYS_MESSAGE = "Reserved rental days:";
+    private static final String INVOICE_ACTUAL_RETURN_MESSAGE = "Actual return date:";
+    private static final String INVOICE_ACTUAL_RENTAL_DAYS_MESSAGE = "Actual rental days:";
+
+    private static final String INVOICE_RENTAL_COST_PER_DAY_MESSAGE = "Rental cost per day:$";
+    private static final String INVOICE_INSURANCE_PER_DAY_MESSAGE = "Insurance per day:$";
+    private static final String INVOICE_SAVED_RENT_MESSAGE = "Early return discount for rent:$";
+    private static final String INVOICE_SAVED_INSURACE_MESSAGE = "Early return discount for insurance:$";
+
+    private static final String INVOICE_INITIAL_INSURANCE_PER_DAY_MESSAGE = "Initial insurance per day:$";
+    private static final String INVOICE_SURCHARGE_MESSAGE = "Insurance addition pay per day:$";
+    private static final String INVOICE_DISCOUNT_MESSAGE = "Insurance discount per day:$";
+
+    private static final String INVOICE_TOTAL_RENT_MESSAGE = "Total rent:$";
+    private static final String INVOICE_TOTAL_INSURANCE_MESSAGE = "Total insurance:$";
+    private static final String INVOICE_TOTAL_MESSAGE = "Total:$";
+
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
 
@@ -127,7 +147,7 @@ public class Main {
 
         switch (vehicleType) {
             case "car":
-                if(driver.getDiscountFactor() > 3){
+                if (driver.getDiscountFactor() > 3) {
                     insuranceModifier = BigDecimal.valueOf(driversInsurance * CAR_INSURANCE_DISCOUNT);
                     BigDecimal roundedModifier = insuranceModifier.setScale(1, RoundingMode.HALF_UP);
                     insurance = driversInsurance - roundedModifier.doubleValue();
@@ -135,7 +155,7 @@ public class Main {
                 }
                 break;
             case "motorcycle":
-                if(driver.getDiscountFactor() < 25){
+                if (driver.getDiscountFactor() < 25) {
                     insuranceModifier = BigDecimal.valueOf(driversInsurance * MOTORCYCLE_INSURANCE_SURCHARGE);
                     BigDecimal roundedModifier = insuranceModifier.setScale(1, RoundingMode.HALF_UP);
                     insurance = driversInsurance + roundedModifier.doubleValue();
@@ -143,7 +163,7 @@ public class Main {
                 }
                 break;
             case "cargo van":
-                if(driver.getDiscountFactor() > 5){
+                if (driver.getDiscountFactor() > 5) {
                     insuranceModifier = BigDecimal.valueOf(driversInsurance * CARGO_VAN_INSURANCE_DISCOUNT);
                     BigDecimal roundedModifier = insuranceModifier.setScale(1, RoundingMode.HALF_UP);
                     insurance = driversInsurance - roundedModifier.doubleValue();
@@ -155,7 +175,7 @@ public class Main {
         long daysUsedFor = ChronoUnit.DAYS.between(start, actual);
         long discountedDays = daysRentedFor - daysUsedFor;
 
-        if(discountedDays > 1){
+        if (discountedDays > 1) {
             long fullyChargedDays = daysRentedFor - discountedDays;
             double rentalCost = driver.getVehicle().getRentalCost();
             insurance = driver.getVehicle().getInsurance();
@@ -163,24 +183,109 @@ public class Main {
             double fullyChargedRent = rentalCost * fullyChargedDays;
             double fullyChargedInsurance = insurance * fullyChargedDays;
 
-            double discountedRent = (rentalCost/2) * discountedDays;
+            double discountedRent = (rentalCost / 2) * discountedDays;
             double discountedInsurance = insurance * 0;
 
             double totalRentPaid = fullyChargedRent + discountedRent;
             double totalInsurancePaid = fullyChargedInsurance + discountedInsurance;
             double total = totalInsurancePaid + totalRentPaid;
 
-            System.out.println("rental cost: "+rentalCost);
-            System.out.println("initial insurance: "+initialInsurance);
-            System.out.println("insurance discount/surcharge: "+insuranceModifier.setScale(1, RoundingMode.HALF_UP));
-            System.out.println("insurance per day: "+insurance);
+            StringBuilder sb = new StringBuilder();
+            sb.append(INVOICE_LAYOUT)
+                    .append(System.lineSeparator());
+            sb.append("Date: " + LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")))
+                    .append(System.lineSeparator());
+            sb.append("Customer name: " + driver.getName())
+                    .append(System.lineSeparator())
+                    .append(System.lineSeparator());
+            sb.append(String.format("Rented vehicle: %s %s", vehicle.getBrand(), vehicle.getModel()))
+                    .append(System.lineSeparator())
+                    .append(System.lineSeparator());
+            sb.append(INVOICE_START_MESSAGE + startDate)
+                    .append(System.lineSeparator());
+            sb.append(INVOICE_END_MESSAGE + endDate)
+                    .append(System.lineSeparator());
+            sb.append(INVOICE_RENTAL_DAYS_MESSAGE + daysRentedFor)
+                    .append(System.lineSeparator())
+                    .append(System.lineSeparator());
+            sb.append(INVOICE_ACTUAL_RETURN_MESSAGE + returnDate)
+                    .append(System.lineSeparator());
+            sb.append(INVOICE_ACTUAL_RENTAL_DAYS_MESSAGE + daysUsedFor)
+                    .append(System.lineSeparator())
+                    .append(System.lineSeparator());
+            sb.append(INVOICE_RENTAL_COST_PER_DAY_MESSAGE + rentalCost)
+                    .append(System.lineSeparator());
+            sb.append(INVOICE_INITIAL_INSURANCE_PER_DAY_MESSAGE + initialInsurance)
+                    .append(System.lineSeparator());
+            sb.append(INVOICE_DISCOUNT_MESSAGE + insuranceModifier.setScale(1, RoundingMode.HALF_UP))
+                    .append(System.lineSeparator());
+            sb.append(INVOICE_INSURANCE_PER_DAY_MESSAGE + insurance)
+                    .append(System.lineSeparator())
+                    .append(System.lineSeparator());
+            sb.append(INVOICE_SAVED_RENT_MESSAGE + discountedRent)
+                    .append(System.lineSeparator());
+            sb.append(INVOICE_SAVED_INSURACE_MESSAGE + fullyChargedInsurance / 2)
+                    .append(System.lineSeparator());
+            sb.append(INVOICE_TOTAL_RENT_MESSAGE + totalRentPaid)
+                    .append(System.lineSeparator());
+            sb.append(INVOICE_TOTAL_INSURANCE_MESSAGE + totalInsurancePaid)
+                    .append(System.lineSeparator());
+            sb.append(INVOICE_TOTAL_MESSAGE + total)
+                    .append(System.lineSeparator());
+        } else {
+            long fullyChargedDays = daysRentedFor - discountedDays;
+            double rentalCost = driver.getVehicle().getRentalCost();
+            insurance = driver.getVehicle().getInsurance();
 
-            System.out.println("early return discount for rent:"+discountedRent);
-            System.out.println("early return discount for insurance"+fullyChargedInsurance/2);
+            double fullyChargedRent = rentalCost * fullyChargedDays;
+            double fullyChargedInsurance = insurance * fullyChargedDays;
 
-            System.out.println("total rent: "+totalRentPaid);
-            System.out.println("total insurance: "+totalInsurancePaid);
-            System.out.println("total paid: "+total);
+            double discountedRent = 0;
+            double discountedInsurance = insurance * 0;
+
+            double total = fullyChargedRent + fullyChargedInsurance;
+
+            StringBuilder sb = new StringBuilder();
+            sb.append(INVOICE_LAYOUT)
+                    .append(System.lineSeparator());
+            sb.append("Date: " + LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")))
+                    .append(System.lineSeparator());
+            sb.append("Customer name: " + driver.getName())
+                    .append(System.lineSeparator())
+                    .append(System.lineSeparator());
+            sb.append(String.format("Rented vehicle: %s %s", vehicle.getBrand(), vehicle.getModel()))
+                    .append(System.lineSeparator())
+                    .append(System.lineSeparator());
+            sb.append(INVOICE_START_MESSAGE + startDate)
+                    .append(System.lineSeparator());
+            sb.append(INVOICE_END_MESSAGE + endDate)
+                    .append(System.lineSeparator());
+            sb.append(INVOICE_RENTAL_DAYS_MESSAGE + daysRentedFor)
+                    .append(System.lineSeparator())
+                    .append(System.lineSeparator());
+            sb.append(INVOICE_ACTUAL_RETURN_MESSAGE + returnDate)
+                    .append(System.lineSeparator());
+            sb.append(INVOICE_ACTUAL_RENTAL_DAYS_MESSAGE + daysUsedFor)
+                    .append(System.lineSeparator())
+                    .append(System.lineSeparator());
+            sb.append(INVOICE_RENTAL_COST_PER_DAY_MESSAGE + rentalCost)
+                    .append(System.lineSeparator());
+            sb.append(INVOICE_INSURANCE_PER_DAY_MESSAGE + insurance)
+                    .append(System.lineSeparator())
+                    .append(System.lineSeparator());
+            sb.append(INVOICE_TOTAL_RENT_MESSAGE + fullyChargedRent)
+                    .append(System.lineSeparator());
+            sb.append(INVOICE_TOTAL_INSURANCE_MESSAGE + fullyChargedInsurance)
+                    .append(System.lineSeparator());
+            sb.append(INVOICE_TOTAL_MESSAGE + total)
+                    .append(System.lineSeparator());
+
+            System.out.println("rental cost: " + rentalCost);
+            System.out.println("initial insurance: " + initialInsurance);
+
+            System.out.println("total rent: " + fullyChargedRent);
+            System.out.println("total insurance: " + fullyChargedInsurance);
+            System.out.println("total paid: " + total);
         }
 
     }
