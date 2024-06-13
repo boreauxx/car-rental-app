@@ -1,22 +1,27 @@
-package org.example;
+package org.example.objects;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.math.BigDecimal;
-
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Vehicle {
+public abstract class Vehicle {
 
     private String brand;
     private String model;
     private double value;
-    private String type;
     private double rentalCost;
     private double insurance;
+
+    public abstract void setDiscountInsurance();
+
+    public abstract void setDiscountRentalCost();
+
+    public abstract double getInitInsurance();
+
+    public abstract double getInsuranceModifier();
 }

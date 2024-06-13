@@ -1,6 +1,10 @@
 package org.example;
 
-import java.math.BigDecimal;
+import org.example.objects.Car;
+import org.example.objects.CargoVan;
+import org.example.objects.Motorcycle;
+import org.example.objects.Vehicle;
+
 import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -10,23 +14,9 @@ import java.util.Scanner;
 
 public class Main {
 
-    private static final double CAR_RENTAL_COST = 20.00;
-    private static final double MOTORCYCLE_RENTAL_PRICE = 15.00;
-    private static final double CARGO_VAN_RENTAL_PRICE = 50.00;
+    private static final List<String> ALLOWED_VEHICLES = List.of("CAR", "MOTORCYCLE", "CARGO VAN");
 
-    private static final double CAR_RENTAL_PRICE_DISCOUNTED = 15.00;
-    private static final double MOTORCYCLE_RENTAL_PRICE_DISCOUNTED = 10.00;
-    private static final double CARGO_VAN_RENTAL_PRICE_DISCOUNTED = 40.00;
-
-    private static final double CAR_INSURANCE = 0.1;
-    private static final double MOTORCYCLE_INSURANCE = 0.2;
-    private static final double CARGO_VAN_INSURANCE = 0.3;
-
-    private static final double CAR_INSURANCE_DISCOUNT = 0.10;
-    private static final double MOTORCYCLE_INSURANCE_SURCHARGE = 0.20;
-    private static final double CARGO_VAN_INSURANCE_DISCOUNT = 0.15;
-
-    private static final String FIRST_MESSAGE = "Hello! Please enter your name:";
+    private static final String CUSOMTER_NAME_MESSAGE = "Hello! Please enter your name:";
     private static final String CHOOSE_VEHILE_TYPE_MESSAGE = "Please choose one of the following options: car, motorcycle, cargo van";
     private static final String CHOOSE_BRAND_MESSAGE = "Please submit the brand:";
     private static final String CHOOSE_MODEL_MESSAGE = "Please submit the model:";
@@ -63,12 +53,12 @@ public class Main {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
 
-        System.out.println(FIRST_MESSAGE);
+        System.out.println(CUSOMTER_NAME_MESSAGE);
         String customerName = scanner.nextLine();
 
         System.out.println(CHOOSE_VEHILE_TYPE_MESSAGE);
         String vehicleType = scanner.nextLine();
-        List<String> allowedVehicleTypes = List.of("car", "motorcycle", "cargo van");
+        List<String> allowedVehicleTypes = ALLOWED_VEHICLES;
         if (!allowedVehicleTypes.contains(vehicleType)) {
             System.out.println(INVALID_TYPE);
         }
@@ -82,36 +72,23 @@ public class Main {
         System.out.println(CHOOSE_VALUE_MESSAGE);
         double value = Double.parseDouble(scanner.nextLine());
 
-        double initialInsurance = 0.00;
-        Vehicle vehicle = new Vehicle();
-        Driver driver = new Driver();
-
-        switch (vehicleType) {
-            case "car":
+        int discountOrSurchargeElement = switch (vehicleType) {
+            case "car" -> {
                 System.out.println(CHOOSE_CAR_SAFETY_MESSAGE);
-                int safetyRange = Integer.parseInt(scanner.nextLine());
-
-                initialInsurance = Math.round(value * CAR_INSURANCE);
-                vehicle = new Vehicle(brand, model, value, vehicleType, CAR_RENTAL_COST, initialInsurance);
-                driver = new Driver(customerName, safetyRange, vehicle);
-                break;
-            case "motorcycle":
+                yield Integer.parseInt(scanner.nextLine());
+            }
+            case "motorcycle" -> {
                 System.out.println(CHOOSE_AGE_MESSAGE);
-                int age = Integer.parseInt(scanner.nextLine());
-
-                initialInsurance = Math.round(value * MOTORCYCLE_INSURANCE);
-                vehicle = new Vehicle(brand, model, value, vehicleType, MOTORCYCLE_RENTAL_PRICE, initialInsurance);
-                driver = new Driver(customerName, age, vehicle);
-                break;
-            case "cargo van":
+                yield Integer.parseInt(scanner.nextLine());
+            }
+            case "cargo van" -> {
                 System.out.println(CHOOSE_EXPERIENCE_MESSAGE);
-                int experience = Integer.parseInt(scanner.nextLine());
+                yield Integer.parseInt(scanner.nextLine());
+            }
+            default -> 0;
+        };
 
-                initialInsurance = Math.round(value * CARGO_VAN_INSURANCE);
-                vehicle = new Vehicle(brand, model, value, vehicleType, CARGO_VAN_RENTAL_PRICE, initialInsurance);
-                driver = new Driver(customerName, experience, vehicle);
-                break;
-        }
+        Vehicle vehicle = createVehicle(vehicleType, brand, model, value, discountOrSurchargeElement);
 
         System.out.println(STARTING_RENT_DAY_MESSAGE);
         String startDate = scanner.nextLine();
@@ -128,46 +105,23 @@ public class Main {
         long daysRentedFor = ChronoUnit.DAYS.between(start, end);
 
         if (daysRentedFor > 7L) {
-            switch (vehicleType) {
-                case "car":
-                    driver.getVehicle().setRentalCost(CAR_RENTAL_PRICE_DISCOUNTED);
-                    break;
-                case "motorcycle":
-                    driver.getVehicle().setRentalCost(MOTORCYCLE_RENTAL_PRICE_DISCOUNTED);
-                    break;
-                case "cargo van":
-                    driver.getVehicle().setRentalCost(CARGO_VAN_RENTAL_PRICE_DISCOUNTED);
-                    break;
-            }
+            vehicle.setDiscountRentalCost();
         }
 
-        double driversInsurance = driver.getVehicle().getInsurance();
-        double insurance = 0.00;
-        BigDecimal insuranceModifier = new BigDecimal("0");
-
         switch (vehicleType) {
-            case "car":
-                if (driver.getDiscountFactor() > 3) {
-                    insuranceModifier = BigDecimal.valueOf(driversInsurance * CAR_INSURANCE_DISCOUNT);
-                    BigDecimal roundedModifier = insuranceModifier.setScale(1, RoundingMode.HALF_UP);
-                    insurance = driversInsurance - roundedModifier.doubleValue();
-                    driver.getVehicle().setInsurance(insurance);
+            case "CAR":
+                if(discountOrSurchargeElement > 3){
+                    vehicle.setDiscountInsurance();
                 }
                 break;
-            case "motorcycle":
-                if (driver.getDiscountFactor() < 25) {
-                    insuranceModifier = BigDecimal.valueOf(driversInsurance * MOTORCYCLE_INSURANCE_SURCHARGE);
-                    BigDecimal roundedModifier = insuranceModifier.setScale(1, RoundingMode.HALF_UP);
-                    insurance = driversInsurance + roundedModifier.doubleValue();
-                    driver.getVehicle().setInsurance(insurance);
+            case "MOTORCYCLE":
+                if(discountOrSurchargeElement < 25){
+                    vehicle.setDiscountInsurance();
                 }
                 break;
-            case "cargo van":
-                if (driver.getDiscountFactor() > 5) {
-                    insuranceModifier = BigDecimal.valueOf(driversInsurance * CARGO_VAN_INSURANCE_DISCOUNT);
-                    BigDecimal roundedModifier = insuranceModifier.setScale(1, RoundingMode.HALF_UP);
-                    insurance = driversInsurance - roundedModifier.doubleValue();
-                    driver.getVehicle().setInsurance(insurance);
+            case "CARGO VAN":
+                if(discountOrSurchargeElement > 8){
+                    vehicle.setDiscountInsurance();
                 }
                 break;
         }
@@ -179,8 +133,8 @@ public class Main {
 
         if (discountedDays > 1) {
             long fullyChargedDays = daysRentedFor - discountedDays;
-            double rentalCost = driver.getVehicle().getRentalCost();
-            insurance = driver.getVehicle().getInsurance();
+            double rentalCost = vehicle.getRentalCost();
+            double insurance = vehicle.getInsurance();
 
             double fullyChargedRent = rentalCost * fullyChargedDays;
             double fullyChargedInsurance = insurance * fullyChargedDays;
@@ -196,7 +150,7 @@ public class Main {
                     .append(System.lineSeparator());
             sb.append("Date: " + LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")))
                     .append(System.lineSeparator());
-            sb.append("Customer name: " + driver.getName())
+            sb.append("Customer name: " + customerName)
                     .append(System.lineSeparator())
                     .append(System.lineSeparator());
             sb.append(String.format("Rented vehicle: %s %s", vehicle.getBrand(), vehicle.getModel()))
@@ -216,9 +170,9 @@ public class Main {
                     .append(System.lineSeparator());
             sb.append(INVOICE_RENTAL_COST_PER_DAY_MESSAGE + rentalCost)
                     .append(System.lineSeparator());
-            sb.append(INVOICE_INITIAL_INSURANCE_PER_DAY_MESSAGE + initialInsurance)
+            sb.append(INVOICE_INITIAL_INSURANCE_PER_DAY_MESSAGE + vehicle.getInitInsurance())
                     .append(System.lineSeparator());
-            sb.append(INVOICE_DISCOUNT_MESSAGE + insuranceModifier.setScale(1, RoundingMode.HALF_UP))
+            sb.append(INVOICE_DISCOUNT_MESSAGE + vehicle.getInsuranceModifier())
                     .append(System.lineSeparator());
             sb.append(INVOICE_INSURANCE_PER_DAY_MESSAGE + insurance)
                     .append(System.lineSeparator())
@@ -236,14 +190,11 @@ public class Main {
         }
         else {
             long fullyChargedDays = daysRentedFor - discountedDays;
-            double rentalCost = driver.getVehicle().getRentalCost();
-            insurance = driver.getVehicle().getInsurance();
+            double rentalCost = vehicle.getRentalCost();
+            double insurance = vehicle.getInsurance();
 
             double fullyChargedRent = rentalCost * fullyChargedDays;
             double fullyChargedInsurance = insurance * fullyChargedDays;
-
-            double discountedRent = 0;
-            double discountedInsurance = insurance * 0;
 
             double total = fullyChargedRent + fullyChargedInsurance;
 
@@ -251,7 +202,7 @@ public class Main {
                     .append(System.lineSeparator());
             sb.append("Date: " + LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")))
                     .append(System.lineSeparator());
-            sb.append("Customer name: " + driver.getName())
+            sb.append("Customer name: " + customerName)
                     .append(System.lineSeparator())
                     .append(System.lineSeparator());
             sb.append(String.format("Rented vehicle: %s %s", vehicle.getBrand(), vehicle.getModel()))
@@ -284,5 +235,21 @@ public class Main {
         System.out.println(sb.toString());
     }
 
+    private static Vehicle createVehicle(String type, String brand, String model, double value, int factor) {
+        switch (type) {
+            case "CAR":
+                return new Car(brand, model, value, factor);
+            case "MOTORCYCLE":
+                return new Motorcycle(brand, model, value, factor);
+            case "CARGO VAN":
+                return new CargoVan(brand, model, value, factor);
+            default:
+                throw new IllegalArgumentException("Invalid vehicle type");
+        }
+    }
+
+    private static void printInvoice(){
+
+    }
 
 }
