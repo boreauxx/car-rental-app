@@ -44,7 +44,7 @@ public class Main {
         String model = scanner.nextLine();
 
         System.out.println("Please submit the value of the vehicle:");
-        double value = Double.parseDouble(scanner.nextLine());;
+        double value = Double.parseDouble(scanner.nextLine());
 
         double insurance = 0.00;
         Vehicle vehicle = new Vehicle();
@@ -132,6 +132,8 @@ public class Main {
             long fullChargeRentDays = daysRented - discountedRentDays;
 
         }
+
+        // TODO: CALCULATE INVOICE
 
     }
 }
