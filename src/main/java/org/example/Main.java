@@ -175,6 +175,8 @@ public class Main {
         long daysUsedFor = ChronoUnit.DAYS.between(start, actual);
         long discountedDays = daysRentedFor - daysUsedFor;
 
+        StringBuilder sb = new StringBuilder();
+
         if (discountedDays > 1) {
             long fullyChargedDays = daysRentedFor - discountedDays;
             double rentalCost = driver.getVehicle().getRentalCost();
@@ -190,7 +192,6 @@ public class Main {
             double totalInsurancePaid = fullyChargedInsurance + discountedInsurance;
             double total = totalInsurancePaid + totalRentPaid;
 
-            StringBuilder sb = new StringBuilder();
             sb.append(INVOICE_LAYOUT)
                     .append(System.lineSeparator());
             sb.append("Date: " + LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")))
@@ -232,7 +233,8 @@ public class Main {
                     .append(System.lineSeparator());
             sb.append(INVOICE_TOTAL_MESSAGE + total)
                     .append(System.lineSeparator());
-        } else {
+        }
+        else {
             long fullyChargedDays = daysRentedFor - discountedDays;
             double rentalCost = driver.getVehicle().getRentalCost();
             insurance = driver.getVehicle().getInsurance();
@@ -245,7 +247,6 @@ public class Main {
 
             double total = fullyChargedRent + fullyChargedInsurance;
 
-            StringBuilder sb = new StringBuilder();
             sb.append(INVOICE_LAYOUT)
                     .append(System.lineSeparator());
             sb.append("Date: " + LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")))
@@ -287,7 +288,7 @@ public class Main {
             System.out.println("total insurance: " + fullyChargedInsurance);
             System.out.println("total paid: " + total);
         }
-
+        System.out.println(sb.toString());
     }
 
 
