@@ -3,6 +3,9 @@ package org.example.objects;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+
 @Getter
 @Setter
 public class CargoVan extends Vehicle {
@@ -14,24 +17,26 @@ public class CargoVan extends Vehicle {
 
     private int experience;
 
-    public CargoVan(String brand, String model, double value, int experience) {
-        super(brand, model, value, CARGO_VAN_RENTAL_PRICE, value * CARGO_VAN_INSURANCE);
+    public CargoVan(String brand, String model, BigDecimal value, int experience) {
+        super(brand, model, value, BigDecimal.valueOf(CARGO_VAN_RENTAL_PRICE),
+                value.multiply(BigDecimal.valueOf(CARGO_VAN_INSURANCE)).setScale(1, RoundingMode.HALF_UP), false);
         this.experience = experience;
     }
 
-    public double getInitInsurance(){
-        return CARGO_VAN_INSURANCE * getValue();
+    public BigDecimal getInitInsurance(){
+        return getValue().multiply(BigDecimal.valueOf(CARGO_VAN_INSURANCE)).setScale(1, RoundingMode.HALF_UP);
     }
 
     public void setDiscountRentalCost() {
-        setRentalCost(CARGO_VAN_RENTAL_PRICE_DISCOUNTED);
+        setRentalCost(BigDecimal.valueOf(CARGO_VAN_RENTAL_PRICE_DISCOUNTED));
     }
 
     public void setModifiedInsurance() {
-        setInsurance(getInsurance() - getInsuranceModifier());
+        setModified(true);
+        setInsurance(getInsurance().subtract(getInsuranceModifier()));
     }
 
-    public double getInsuranceModifier(){
-        return getInsurance() * CARGO_VAN_INSURANCE_DISCOUNT;
+    public BigDecimal getInsuranceModifier(){
+        return getInsurance().multiply(BigDecimal.valueOf(CARGO_VAN_INSURANCE_DISCOUNT)).setScale(1, RoundingMode.HALF_UP);
     }
 }

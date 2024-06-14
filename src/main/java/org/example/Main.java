@@ -2,6 +2,8 @@ package org.example;
 
 import org.example.objects.*;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
@@ -46,7 +48,7 @@ public class Main {
         String model = scanner.nextLine();
 
         System.out.println(CHOOSE_VALUE_MESSAGE);
-        double value = Double.parseDouble(scanner.nextLine());
+        BigDecimal value = BigDecimal.valueOf(Long.parseLong(scanner.nextLine()));
 
         int discountOrSurchargeElement =
                 switch (vehicleType) {
@@ -106,17 +108,17 @@ public class Main {
         long daysUsedFor = ChronoUnit.DAYS.between(start, actual);
         long discountedDays = daysRentedFor - daysUsedFor;
 
-        double rentalCost = vehicle.getRentalCost();
-        double insurance = vehicle.getInsurance();
+        BigDecimal rentalCost = vehicle.getRentalCost();
+        BigDecimal insurance = vehicle.getInsurance();
 
         RentAndInsurance rentAndInsurance = calculateRentAndInsurance(discountedDays, daysRentedFor, rentalCost, insurance);
 
         Invoice invoice = new Invoice(customerName, vehicle, startDate, endDate, returnDate, daysRentedFor, daysUsedFor, rentAndInsurance);
 
-        System.out.println(invoice.formatInvoice(discountedDays));
+        System.out.println(invoice.formatInvoice(!vehicleType.equals("motorcycle")));
     }
 
-    private static Vehicle createVehicle(String type, String brand, String model, double value, int factor) {
+    private static Vehicle createVehicle(String type, String brand, String model, BigDecimal value, int factor) {
         return switch (type) {
             case "car" -> new Car(brand, model, value, factor);
             case "motorcycle" -> new Motorcycle(brand, model, value, factor);
@@ -125,25 +127,25 @@ public class Main {
         };
     }
 
-    private static RentAndInsurance calculateRentAndInsurance(long discountedDays, long daysRentedFor, double rentalCost, double insurance){
+    private static RentAndInsurance calculateRentAndInsurance(long discountedDays, long daysRentedFor, BigDecimal rentalCost, BigDecimal insurance){
         if (discountedDays >= 1) {
             long fullyChargedDays = daysRentedFor - discountedDays;
-            double fullyChargedRent = rentalCost * fullyChargedDays;
-            double fullyChargedInsurance = insurance * fullyChargedDays;
+            BigDecimal fullyChargedRent = rentalCost.multiply(BigDecimal.valueOf(fullyChargedDays)) ;
+            BigDecimal fullyChargedInsurance = insurance.multiply(BigDecimal.valueOf(fullyChargedDays));
 
-            double discountedRent = (rentalCost / 2) * discountedDays;
-            double discountedInsurance = 0;
+            BigDecimal discountedRent = rentalCost.divide(BigDecimal.valueOf(2), RoundingMode.HALF_UP).multiply(BigDecimal.valueOf(discountedDays));
+            BigDecimal discountedInsurance = insurance.multiply(BigDecimal.ZERO);
 
-            double totalRentPaid = fullyChargedRent + discountedRent;
-            double totalInsurancePaid = fullyChargedInsurance + discountedInsurance;
-            double total = totalInsurancePaid + totalRentPaid;
+            BigDecimal totalRentPaid = fullyChargedRent.add(discountedRent);
+            BigDecimal totalInsurancePaid = fullyChargedInsurance.add(discountedInsurance);
+            BigDecimal total = totalInsurancePaid.add(totalRentPaid);
             return new RentAndInsurance(fullyChargedRent, fullyChargedInsurance, discountedRent, discountedInsurance, totalRentPaid, totalInsurancePaid, total);
         }
         else {
-            double totalRentPaid = rentalCost * daysRentedFor;
-            double totalInsurancePaid = insurance * daysRentedFor;
-            double total = totalRentPaid + totalInsurancePaid;
-            return new RentAndInsurance(0.00, 0.00, 0.00, 0.00, totalRentPaid, totalInsurancePaid, total);
+            BigDecimal totalRentPaid = rentalCost.multiply(BigDecimal.valueOf(daysRentedFor));
+            BigDecimal totalInsurancePaid = insurance.multiply(BigDecimal.valueOf(daysRentedFor));
+            BigDecimal total = totalRentPaid.add(totalInsurancePaid);
+            return new RentAndInsurance(BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, totalRentPaid, totalInsurancePaid, total);
         }
     }
 

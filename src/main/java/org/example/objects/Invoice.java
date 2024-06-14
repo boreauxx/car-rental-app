@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
@@ -25,8 +27,8 @@ public class Invoice {
     private static final String SAVED_INSURANCE_MESSAGE = "Early return discount for insurance:$";
 
     private static final String INITIAL_INSURANCE_PER_DAY_MESSAGE = "Initial insurance per day:$";
-    private static final String SURCHARGE_MESSAGE = "Insurance addition pay per day:$";
-    private static final String DISCOUNT_MESSAGE = "Insurance discount per day:$";
+    private static final String SURCHARGE_PER_DAY_MESSAGE = "Insurance addition pay per day:$";
+    private static final String DISCOUNT_PER_DAY_MESSAGE = "Insurance discount per day:$";
 
     private static final String TOTAL_RENT_MESSAGE = "Total rent:$";
     private static final String TOTAL_INSURANCE_MESSAGE = "Total insurance:$";
@@ -44,7 +46,7 @@ public class Invoice {
 
     private RentAndInsurance rentAndInsurance;
 
-    public String formatInvoice(long discountedDays) {
+    public String formatInvoice(boolean isDiscount) {
         StringBuilder sb = new StringBuilder();
         sb
                 .append(LAYOUT)
@@ -79,24 +81,37 @@ public class Invoice {
                 .append(System.lineSeparator())
 
                 .append(RENTAL_COST_PER_DAY_MESSAGE).append(this.vehicle.getRentalCost())
-                .append(System.lineSeparator())
+                .append(System.lineSeparator());
 
-                .append(INITIAL_INSURANCE_PER_DAY_MESSAGE).append(this.vehicle.getInitInsurance())
-                .append(System.lineSeparator())
+        if (this.vehicle.isModified()) {
+            sb
+                    .append(INITIAL_INSURANCE_PER_DAY_MESSAGE).append(this.vehicle.getInitInsurance())
+                    .append(System.lineSeparator());
+            if (isDiscount) {
+                sb
+                        .append(DISCOUNT_PER_DAY_MESSAGE).append(this.vehicle.getInsuranceModifier())
+                        .append(System.lineSeparator());
+            } else {
+                sb
+                        .append(SURCHARGE_PER_DAY_MESSAGE).append(this.vehicle.getInsuranceModifier())
+                        .append(System.lineSeparator());
+            }
+        }
 
-                .append(DISCOUNT_MESSAGE).append(this.vehicle.getInsuranceModifier())
-                .append(System.lineSeparator())
-
+        sb
                 .append(INSURANCE_PER_DAY_MESSAGE).append(this.vehicle.getInsurance())
                 .append(System.lineSeparator())
-                .append(System.lineSeparator())
+                .append(System.lineSeparator());
 
-                .append(SAVED_RENT_MESSAGE).append(this.rentAndInsurance.getDiscountedRent())
-                .append(System.lineSeparator())
+        if (this.rentAndInsurance.getDiscountedRent().doubleValue()>=1) {
+            sb
+                    .append(SAVED_RENT_MESSAGE).append(this.rentAndInsurance.getDiscountedRent())
+                    .append(System.lineSeparator())
+                    .append(SAVED_INSURANCE_MESSAGE).append(this.rentAndInsurance.getFullyChargedInsurance().divide(BigDecimal.valueOf(2), RoundingMode.HALF_UP))
+                    .append(System.lineSeparator());
+        }
 
-                .append(SAVED_INSURANCE_MESSAGE).append(this.rentAndInsurance.getFullyChargedInsurance() / 2)
-                .append(System.lineSeparator())
-
+        sb
                 .append(TOTAL_RENT_MESSAGE).append(this.rentAndInsurance.getTotalRentPaid())
                 .append(System.lineSeparator())
 

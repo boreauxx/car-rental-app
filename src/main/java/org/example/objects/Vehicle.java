@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -13,15 +15,16 @@ public abstract class Vehicle {
 
     private String brand;
     private String model;
-    private double value;
-    private double rentalCost;
-    private double insurance;
-
-    public abstract double getInitInsurance();
+    private BigDecimal value;
+    private BigDecimal rentalCost;
+    private BigDecimal insurance;
+    private boolean modified = false;
 
     public abstract void setDiscountRentalCost();
 
+    public abstract BigDecimal getInitInsurance();
+
     public abstract void setModifiedInsurance();
 
-    public abstract double getInsuranceModifier();
+    public abstract BigDecimal getInsuranceModifier();
 }

@@ -3,6 +3,9 @@ package org.example.objects;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+
 @Getter
 @Setter
 public class Motorcycle extends Vehicle {
@@ -14,24 +17,26 @@ public class Motorcycle extends Vehicle {
 
     private int ageLimit;
 
-    public Motorcycle(String brand, String model, double value, int ageLimit) {
-        super(brand, model, value, MOTORCYCLE_RENTAL_PRICE, value * MOTORCYCLE_INSURANCE);
+    public Motorcycle(String brand, String model, BigDecimal value, int ageLimit) {
+        super(brand, model, value, BigDecimal.valueOf(MOTORCYCLE_RENTAL_PRICE),
+                value.multiply(BigDecimal.valueOf(MOTORCYCLE_INSURANCE)), false);
         this.ageLimit = ageLimit;
     }
 
-    public double getInitInsurance(){
-        return MOTORCYCLE_INSURANCE * getValue();
+    public BigDecimal getInitInsurance(){
+        return getValue().multiply(BigDecimal.valueOf(MOTORCYCLE_INSURANCE)).setScale(1, RoundingMode.HALF_UP);
     }
 
     public void setDiscountRentalCost() {
-        setRentalCost(MOTORCYCLE_RENTAL_PRICE_DISCOUNTED);
+        setRentalCost(BigDecimal.valueOf(MOTORCYCLE_RENTAL_PRICE_DISCOUNTED));
     }
 
     public void setModifiedInsurance() {
-        setInsurance(getInsurance() + getInsuranceModifier());
+        setModified(true);
+        setInsurance(getInsurance().add(getInsuranceModifier()));
     }
 
-    public double getInsuranceModifier(){
-        return getInsurance() * MOTORCYCLE_INSURANCE_SURCHARGE;
+    public BigDecimal getInsuranceModifier(){
+        return getInsurance().multiply(BigDecimal.valueOf(MOTORCYCLE_INSURANCE_SURCHARGE)).setScale(1, RoundingMode.HALF_UP);
     }
 }
