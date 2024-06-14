@@ -1,9 +1,10 @@
 package org.example;
 
 import org.example.objects.*;
+import org.example.services.ProcessingService;
+import org.example.services.ProcessingServiceImpl;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
@@ -18,16 +19,25 @@ public class Main {
     private static final String CHOOSE_BRAND_MESSAGE = "Please submit the brand:";
     private static final String CHOOSE_MODEL_MESSAGE = "Please submit the model:";
     private static final String CHOOSE_VALUE_MESSAGE = "Please submit the value of the vehicle:";
+
     private static final String CHOOSE_CAR_SAFETY_MESSAGE = "Please submit the car's safety range";
     private static final String CHOOSE_AGE_MESSAGE = "Please submit your age:";
     private static final String CHOOSE_EXPERIENCE_MESSAGE = "Please submit your driver's experience";
-    private static final String STARTING_RENT_DAY_MESSAGE = "Please enter the rent starting day in the format dd/mm/yyyy:";
-    private static final String ENDING_RENT_DAY_MESSAGE = "Please enter the rent ending day in the format dd/mm/yyyy:";
-    private static final String ACTUAL_RETURN_DAY_MESSAGE = "Please enter the day you returned the vehicle in the format dd/mm/yyyy:";
+
+    private static final String STARTING_RENT_DAY_MESSAGE = "Please enter the rent starting day in the format - dd/mm/yyyy:";
+    private static final String ENDING_RENT_DAY_MESSAGE = "Please enter the rent ending day in the format - dd/mm/yyyy:";
+    private static final String ACTUAL_RETURN_DAY_MESSAGE = "Please enter the day you returned the vehicle in the format - dd/mm/yyyy:";
+
     private static final String INVALID_TYPE = "Please choose a valid vehicle type!";
+    private static final String INVALID_VALUE_MESSAGE = "Please enter the sum in the following format - 5,000/20,000/35,000";
+    private static final String INVALID_SAFETY_RATING_MESSAGE = "Please submit a valid rating, 1 to 5 included!";
+    private static final String INVALID_AGE_MESSAGE = "Please submit a valid age! 18+";
+    private static final String INVALID_EXPERIENCE_MESSAGE = "Please submit valid experience in years!";
+    private static final String INVALID_DATE_FORMAT_MESSAGE = "Please submit a valid date in the format - dd/mm/yyyy";
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
+        ProcessingService processingService = new ProcessingServiceImpl();
 
         System.out.println(CUSTOMER_NAME_MESSAGE);
         String customerName = scanner.nextLine();
@@ -35,8 +45,7 @@ public class Main {
         System.out.println(CHOOSE_VEHICLE_TYPE_MESSAGE);
         String vehicleType = scanner.nextLine();
 
-        // TODO: FIX
-        if (!ALLOWED_VEHICLES.contains(vehicleType)) {
+        while (!ALLOWED_VEHICLES.contains(vehicleType)) {
             System.out.println(INVALID_TYPE);
             vehicleType = scanner.nextLine();
         }
@@ -48,105 +57,103 @@ public class Main {
         String model = scanner.nextLine();
 
         System.out.println(CHOOSE_VALUE_MESSAGE);
-        BigDecimal value = BigDecimal.valueOf(Long.parseLong(scanner.nextLine()));
+        boolean validInput = false;
+        BigDecimal value = BigDecimal.ZERO;
 
-        int discountOrSurchargeElement =
-                switch (vehicleType) {
-                    case "car" -> {
-                        System.out.println(CHOOSE_CAR_SAFETY_MESSAGE);
-                        yield Integer.parseInt(scanner.nextLine());
-                    }
-                    case "motorcycle" -> {
-                        System.out.println(CHOOSE_AGE_MESSAGE);
-                        yield Integer.parseInt(scanner.nextLine());
-                    }
-                    case "cargo van" -> {
-                        System.out.println(CHOOSE_EXPERIENCE_MESSAGE);
-                        yield Integer.parseInt(scanner.nextLine());
-                    }
-                    default -> 0;
-                };
+        while (!validInput) {
+            try {
+                String valueInput = scanner.nextLine().replace(",", "");
+                value = BigDecimal.valueOf(Long.parseLong(valueInput));
+                validInput = true;
+            } catch (Exception exception) {
+                System.out.println(INVALID_VALUE_MESSAGE);
+            }
+        }
 
-        Vehicle vehicle = createVehicle(vehicleType, brand, model, value, discountOrSurchargeElement);
+        int discountOrSurchargeElement = 0;
+
+        while (validInput) {
+            try {
+                processingService.chooseMessageViaVehicleType(vehicleType, CHOOSE_CAR_SAFETY_MESSAGE, CHOOSE_AGE_MESSAGE, CHOOSE_EXPERIENCE_MESSAGE);
+                discountOrSurchargeElement = Integer.parseInt(scanner.nextLine());
+                validInput = false;
+            } catch (Exception exception) {
+                processingService.chooseMessageViaVehicleType(vehicleType, INVALID_SAFETY_RATING_MESSAGE, INVALID_AGE_MESSAGE, INVALID_EXPERIENCE_MESSAGE);
+            }
+        }
+
+        Vehicle vehicle = processingService.createVehicle(vehicleType, brand, model, value, discountOrSurchargeElement);
 
         System.out.println(STARTING_RENT_DAY_MESSAGE);
-        String startDate = scanner.nextLine();
-        LocalDate start = LocalDate.parse(startDate, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
-
+        String startDateInput = "";
+        LocalDate startDate = LocalDate.now();
+        while(!validInput){
+            try{
+                startDateInput = scanner.nextLine();
+                startDate = LocalDate.parse(startDateInput, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+                validInput = true;
+            }
+            catch (Exception exception){
+                System.out.println(INVALID_DATE_FORMAT_MESSAGE);
+            }
+        }
         System.out.println(ENDING_RENT_DAY_MESSAGE);
-        String endDate = scanner.nextLine();
-        LocalDate end = LocalDate.parse(endDate, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+        String endDateInput = "";
+        LocalDate endDate = LocalDate.now();
+
+        while(validInput){
+            try {
+                endDateInput = scanner.nextLine();
+                endDate = LocalDate.parse(endDateInput, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+                boolean endDateIsValid = processingService.validateEndAndReturnDates(startDate, endDate, endDateInput);
+                if(!endDateIsValid){
+                    throw new Exception();
+                }
+                validInput = false;
+            }
+            catch (Exception exception){
+                System.out.println(INVALID_DATE_FORMAT_MESSAGE);
+            }
+        }
 
         System.out.println(ACTUAL_RETURN_DAY_MESSAGE);
-        String returnDate = scanner.nextLine();
-        LocalDate actual = LocalDate.parse(returnDate, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+        String returnDateInput = "";
+        LocalDate returnDate = LocalDate.now();
 
-        long daysRentedFor = ChronoUnit.DAYS.between(start, end);
-
-        if (daysRentedFor > 7L) {
-            vehicle.setDiscountRentalCost();
+        while(!validInput){
+            try {
+                returnDateInput = scanner.nextLine();
+                returnDate = LocalDate.parse(returnDateInput, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+                boolean returnDateIsValid = processingService.validateEndAndReturnDates(startDate, returnDate, returnDateInput);
+                if(!returnDateIsValid){
+                    throw new Exception();
+                }
+                validInput = true;
+            }
+            catch (Exception exception){
+                System.out.println(INVALID_DATE_FORMAT_MESSAGE);
+            }
         }
 
-        switch (vehicleType) {
-            case "car":
-                if (discountOrSurchargeElement > 3) {
-                    vehicle.setModifiedInsurance();
-                }
-                break;
-            case "motorcycle":
-                if (discountOrSurchargeElement < 25) {
-                    vehicle.setModifiedInsurance();
-                }
-                break;
-            case "cargo van":
-                if (discountOrSurchargeElement > 5) {
-                    vehicle.setModifiedInsurance();
-                }
-                break;
-        }
+        long daysRentedFor = ChronoUnit.DAYS.between(startDate, endDate);
 
-        long daysUsedFor = ChronoUnit.DAYS.between(start, actual);
+        processingService.checkForRentalDiscount(daysRentedFor, vehicle);
+
+        processingService.checkForFactorDiscountOrSurcharge(vehicleType,discountOrSurchargeElement, vehicle);
+
+        long daysUsedFor = ChronoUnit.DAYS.between(startDate, returnDate);
         long discountedDays = daysRentedFor - daysUsedFor;
-
         BigDecimal rentalCost = vehicle.getRentalCost();
         BigDecimal insurance = vehicle.getInsurance();
 
-        RentAndInsurance rentAndInsurance = calculateRentAndInsurance(discountedDays, daysRentedFor, rentalCost, insurance);
+        RentAndInsurance rentAndInsurance = processingService.calculateRentAndInsurance(discountedDays, daysRentedFor, rentalCost, insurance);
 
-        Invoice invoice = new Invoice(customerName, vehicle, startDate, endDate, returnDate, daysRentedFor, daysUsedFor, rentAndInsurance);
+        Invoice invoice = new Invoice(customerName, vehicle, startDateInput, endDateInput, returnDateInput, daysRentedFor, daysUsedFor, rentAndInsurance);
 
         System.out.println(invoice.formatInvoice(!vehicleType.equals("motorcycle")));
     }
 
-    private static Vehicle createVehicle(String type, String brand, String model, BigDecimal value, int factor) {
-        return switch (type) {
-            case "car" -> new Car(brand, model, value, factor);
-            case "motorcycle" -> new Motorcycle(brand, model, value, factor);
-            case "cargo van" -> new CargoVan(brand, model, value, factor);
-            default -> throw new IllegalArgumentException("Invalid vehicle type");
-        };
-    }
 
-    private static RentAndInsurance calculateRentAndInsurance(long discountedDays, long daysRentedFor, BigDecimal rentalCost, BigDecimal insurance){
-        if (discountedDays >= 1) {
-            long fullyChargedDays = daysRentedFor - discountedDays;
-            BigDecimal fullyChargedRent = rentalCost.multiply(BigDecimal.valueOf(fullyChargedDays)) ;
-            BigDecimal fullyChargedInsurance = insurance.multiply(BigDecimal.valueOf(fullyChargedDays));
 
-            BigDecimal discountedRent = rentalCost.divide(BigDecimal.valueOf(2), RoundingMode.HALF_UP).multiply(BigDecimal.valueOf(discountedDays));
-            BigDecimal discountedInsurance = insurance.multiply(BigDecimal.ZERO);
-
-            BigDecimal totalRentPaid = fullyChargedRent.add(discountedRent);
-            BigDecimal totalInsurancePaid = fullyChargedInsurance.add(discountedInsurance);
-            BigDecimal total = totalInsurancePaid.add(totalRentPaid);
-            return new RentAndInsurance(fullyChargedRent, fullyChargedInsurance, discountedRent, discountedInsurance, totalRentPaid, totalInsurancePaid, total);
-        }
-        else {
-            BigDecimal totalRentPaid = rentalCost.multiply(BigDecimal.valueOf(daysRentedFor));
-            BigDecimal totalInsurancePaid = insurance.multiply(BigDecimal.valueOf(daysRentedFor));
-            BigDecimal total = totalRentPaid.add(totalInsurancePaid);
-            return new RentAndInsurance(BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, totalRentPaid, totalInsurancePaid, total);
-        }
-    }
 
 }

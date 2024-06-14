@@ -15,24 +15,24 @@ import java.time.format.DateTimeFormatter;
 public class Invoice {
 
     private static final String LAYOUT = "XXXXXXXXXX";
-    private static final String START_DATE_MESSAGE = "Reservation start date:";
-    private static final String END_DATE_MESSAGE = "Reservation end date:";
-    private static final String RESERVED_RENTAL_DAYS_MESSAGE = "Reserved rental days:";
-    private static final String ACTUAL_RETURN_DATE_MESSAGE = "Actual return date:";
-    private static final String ACTUAL_RENTAL_DAYS_MESSAGE = "Actual rental days:";
+    private static final String START_DATE_MESSAGE = "Reservation start date: ";
+    private static final String END_DATE_MESSAGE = "Reservation end date: ";
+    private static final String RESERVED_RENTAL_DAYS_MESSAGE = "Reserved rental days: ";
+    private static final String ACTUAL_RETURN_DATE_MESSAGE = "Actual return date: ";
+    private static final String ACTUAL_RENTAL_DAYS_MESSAGE = "Actual rental days: ";
 
-    private static final String RENTAL_COST_PER_DAY_MESSAGE = "Rental cost per day:$";
-    private static final String INSURANCE_PER_DAY_MESSAGE = "Insurance per day:$";
-    private static final String SAVED_RENT_MESSAGE = "Early return discount for rent:$";
-    private static final String SAVED_INSURANCE_MESSAGE = "Early return discount for insurance:$";
+    private static final String RENTAL_COST_PER_DAY_MESSAGE = "Rental cost per day: $";
+    private static final String INSURANCE_PER_DAY_MESSAGE = "Insurance per day: $";
+    private static final String SAVED_RENT_MESSAGE = "Early return discount for rent: $";
+    private static final String SAVED_INSURANCE_MESSAGE = "Early return discount for insurance: $";
 
-    private static final String INITIAL_INSURANCE_PER_DAY_MESSAGE = "Initial insurance per day:$";
-    private static final String SURCHARGE_PER_DAY_MESSAGE = "Insurance addition pay per day:$";
-    private static final String DISCOUNT_PER_DAY_MESSAGE = "Insurance discount per day:$";
+    private static final String INITIAL_INSURANCE_PER_DAY_MESSAGE = "Initial insurance per day: $";
+    private static final String SURCHARGE_PER_DAY_MESSAGE = "Insurance addition pay per day: $";
+    private static final String DISCOUNT_PER_DAY_MESSAGE = "Insurance discount per day: $";
 
-    private static final String TOTAL_RENT_MESSAGE = "Total rent:$";
-    private static final String TOTAL_INSURANCE_MESSAGE = "Total insurance:$";
-    private static final String TOTAL_MESSAGE = "Total:$";
+    private static final String TOTAL_RENT_MESSAGE = "Total rent: $";
+    private static final String TOTAL_INSURANCE_MESSAGE = "Total insurance: $";
+    private static final String TOTAL_MESSAGE = "Total: $";
 
     private String customerName;
     private Vehicle vehicle;
@@ -47,8 +47,8 @@ public class Invoice {
     private RentAndInsurance rentAndInsurance;
 
     public String formatInvoice(boolean isDiscount) {
-        StringBuilder sb = new StringBuilder();
-        sb
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder
                 .append(LAYOUT)
                 .append(System.lineSeparator())
 
@@ -80,47 +80,47 @@ public class Invoice {
                 .append(System.lineSeparator())
                 .append(System.lineSeparator())
 
-                .append(RENTAL_COST_PER_DAY_MESSAGE).append(this.vehicle.getRentalCost())
+                .append(RENTAL_COST_PER_DAY_MESSAGE).append(this.vehicle.getRentalCost().setScale(2, RoundingMode.HALF_UP))
                 .append(System.lineSeparator());
 
         if (this.vehicle.isModified()) {
-            sb
-                    .append(INITIAL_INSURANCE_PER_DAY_MESSAGE).append(this.vehicle.getInitInsurance())
+            stringBuilder
+                    .append(INITIAL_INSURANCE_PER_DAY_MESSAGE).append(this.vehicle.getInitInsurance().setScale(2, RoundingMode.HALF_UP))
                     .append(System.lineSeparator());
             if (isDiscount) {
-                sb
-                        .append(DISCOUNT_PER_DAY_MESSAGE).append(this.vehicle.getInsuranceModifier())
+                stringBuilder
+                        .append(DISCOUNT_PER_DAY_MESSAGE).append(this.vehicle.getInsuranceModifier().setScale(2, RoundingMode.HALF_UP))
                         .append(System.lineSeparator());
             } else {
-                sb
-                        .append(SURCHARGE_PER_DAY_MESSAGE).append(this.vehicle.getInsuranceModifier())
+                stringBuilder
+                        .append(SURCHARGE_PER_DAY_MESSAGE).append(this.vehicle.getInsuranceModifier().setScale(2, RoundingMode.HALF_UP))
                         .append(System.lineSeparator());
             }
         }
 
-        sb
-                .append(INSURANCE_PER_DAY_MESSAGE).append(this.vehicle.getInsurance())
+        stringBuilder
+                .append(INSURANCE_PER_DAY_MESSAGE).append(this.vehicle.getInsurance().setScale(2, RoundingMode.HALF_UP))
                 .append(System.lineSeparator())
                 .append(System.lineSeparator());
 
         if (this.rentAndInsurance.getDiscountedRent().doubleValue()>=1) {
-            sb
-                    .append(SAVED_RENT_MESSAGE).append(this.rentAndInsurance.getDiscountedRent())
+            stringBuilder
+                    .append(SAVED_RENT_MESSAGE).append(this.rentAndInsurance.getDiscountedRent().setScale(2, RoundingMode.HALF_UP))
                     .append(System.lineSeparator())
                     .append(SAVED_INSURANCE_MESSAGE).append(this.rentAndInsurance.getFullyChargedInsurance().divide(BigDecimal.valueOf(2), RoundingMode.HALF_UP))
                     .append(System.lineSeparator());
         }
 
-        sb
-                .append(TOTAL_RENT_MESSAGE).append(this.rentAndInsurance.getTotalRentPaid())
+        stringBuilder
+                .append(TOTAL_RENT_MESSAGE).append(this.rentAndInsurance.getTotalRentPaid().setScale(2, RoundingMode.HALF_UP))
                 .append(System.lineSeparator())
 
-                .append(TOTAL_INSURANCE_MESSAGE).append(this.rentAndInsurance.getTotalInsurancePaid())
+                .append(TOTAL_INSURANCE_MESSAGE).append(this.rentAndInsurance.getTotalInsurancePaid().setScale(2, RoundingMode.HALF_UP))
                 .append(System.lineSeparator())
 
-                .append(TOTAL_MESSAGE).append(this.rentAndInsurance.getTotal())
+                .append(TOTAL_MESSAGE).append(this.rentAndInsurance.getTotal().setScale(2, RoundingMode.HALF_UP))
                 .append(System.lineSeparator());
 
-        return sb.toString();
+        return stringBuilder.toString();
     }
 }
