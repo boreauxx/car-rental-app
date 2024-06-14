@@ -17,11 +17,11 @@ public abstract class Vehicle {
     private double rentalCost;
     private double insurance;
 
-    public abstract void setDiscountInsurance();
+    public abstract double getInitInsurance();
 
     public abstract void setDiscountRentalCost();
 
-    public abstract double getInitInsurance();
+    public abstract void setModifiedInsurance();
 
     public abstract double getInsuranceModifier();
 }

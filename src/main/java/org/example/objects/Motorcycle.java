@@ -9,11 +9,9 @@ public class Motorcycle extends Vehicle {
 
     private static final double MOTORCYCLE_RENTAL_PRICE = 15.00;
     private static final double MOTORCYCLE_RENTAL_PRICE_DISCOUNTED = 10.00;
-    private static final double MOTORCYCLE_INSURANCE = 0.2;
+    private static final double MOTORCYCLE_INSURANCE = 0.0002;
     private static final double MOTORCYCLE_INSURANCE_SURCHARGE = 0.20;
 
-    private double rentalCost;
-    private double insurance;
     private int ageLimit;
 
     public Motorcycle(String brand, String model, double value, int ageLimit) {
@@ -21,19 +19,19 @@ public class Motorcycle extends Vehicle {
         this.ageLimit = ageLimit;
     }
 
-    public void setDiscountInsurance() {
-        this.insurance = this.insurance + this.insurance * MOTORCYCLE_INSURANCE_SURCHARGE;
+    public double getInitInsurance(){
+        return MOTORCYCLE_INSURANCE * getValue();
     }
 
     public void setDiscountRentalCost() {
-        this.rentalCost = MOTORCYCLE_RENTAL_PRICE_DISCOUNTED;
+        setRentalCost(MOTORCYCLE_RENTAL_PRICE_DISCOUNTED);
     }
 
-    public double getInitInsurance(){
-        return MOTORCYCLE_INSURANCE;
+    public void setModifiedInsurance() {
+        setInsurance(getInsurance() + getInsuranceModifier());
     }
 
     public double getInsuranceModifier(){
-        return 0.0;
+        return getInsurance() * MOTORCYCLE_INSURANCE_SURCHARGE;
     }
 }
