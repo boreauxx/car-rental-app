@@ -1,4 +1,4 @@
-package org.example.objects;
+package org.example.objects.vehicle;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -17,7 +17,6 @@ public class Car extends Vehicle {
 
     public Car(String brand, String model, BigDecimal value, int safetyRating) {
         super(brand, model, value, BigDecimal.valueOf(CAR_RENTAL_PRICE),
-                value.multiply(BigDecimal.valueOf(CAR_INSURANCE)),
                 value.multiply(BigDecimal.valueOf(CAR_INSURANCE)), false);
         this.safetyRating = safetyRating;
     }
@@ -36,7 +35,7 @@ public class Car extends Vehicle {
     }
 
     public BigDecimal getInsuranceModifier() {
-        return getInitialInsurance().multiply(BigDecimal.valueOf(CAR_INSURANCE_DISCOUNT));
+        return getInitInsurance().multiply(BigDecimal.valueOf(CAR_INSURANCE_DISCOUNT));
     }
 
 }

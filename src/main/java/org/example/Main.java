@@ -1,13 +1,16 @@
 package org.example;
 
-import org.example.objects.Invoice;
-import org.example.objects.RentAndInsurance;
-import org.example.objects.Vehicle;
-import org.example.services.ProcessingService;
-import org.example.services.ProcessingServiceImpl;
+import org.example.objects.output.Invoice;
+import org.example.objects.output.RentAndInsurance;
+import org.example.objects.vehicle.Vehicle;
+import org.example.services.input.InputService;
+import org.example.services.input.InputServiceImpl;
+import org.example.services.process.ProcessingService;
+import org.example.services.process.ProcessingServiceImpl;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Scanner;
@@ -22,6 +25,7 @@ public class Main {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         ProcessingService processingService = new ProcessingServiceImpl();
+        InputService inputService = new InputServiceImpl();
 
         String customerName;
         String vehicleType;
@@ -57,30 +61,23 @@ public class Main {
             model = scanner.nextLine();
 
             System.out.println(CHOOSE_VALUE_MESSAGE);
+            value = inputService.valueCLI();
 
-            while (!inputState) {
-                try {
-                    String valueInput = scanner.nextLine().replace(",", "");
-                    value = BigDecimal.valueOf(Long.parseLong(valueInput));
-                    inputState = true;
-                } catch (Exception exception) {
-                    System.out.println(INVALID_VALUE_MESSAGE);
-                }
-            }
-
-            while (inputState) {
-                try {
-                    processingService.chooseMessageViaVehicleType(vehicleType, CHOOSE_CAR_SAFETY_MESSAGE, CHOOSE_AGE_MESSAGE, CHOOSE_EXPERIENCE_MESSAGE);
-                    discountOrSurchargeElement = Integer.parseInt(scanner.nextLine());
-                    inputState = false;
-                } catch (Exception exception) {
-                    processingService.chooseMessageViaVehicleType(vehicleType, INVALID_SAFETY_RATING_MESSAGE, INVALID_AGE_MESSAGE, INVALID_EXPERIENCE_MESSAGE);
-                }
-            }
+            discountOrSurchargeElement = inputService.discountOrSurcharge(vehicleType);
 
             Vehicle vehicle = processingService.createVehicle(vehicleType, brand, model, value, discountOrSurchargeElement);
 
-            processingService.setDatesViaInput(false, startDateInput, startDate, endDateInput, endDate, returnDateInput, returnDate);
+            System.out.println(STARTING_RENT_DAY_MESSAGE);
+            startDateInput = inputService.dateInputCLI();
+            startDate = inputService.startDateCLI(startDateInput);
+
+            System.out.println(ENDING_RENT_DAY_MESSAGE);
+            endDateInput = inputService.dateInputCLI();
+            endDate = inputService.endDateCLI(endDateInput);
+
+            System.out.println(ACTUAL_RETURN_DAY_MESSAGE);
+            returnDateInput = inputService.dateInputCLI();
+            returnDate = inputService.returnDateCLI(returnDateInput);
 
             long daysRentedFor = ChronoUnit.DAYS.between(startDate, endDate);
 

@@ -1,8 +1,9 @@
-package org.example.objects;
+package org.example.objects.output;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import org.example.objects.vehicle.Vehicle;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;

@@ -1,4 +1,4 @@
-package org.example.objects;
+package org.example.objects.output;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

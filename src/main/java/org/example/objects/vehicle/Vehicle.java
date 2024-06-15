@@ -1,4 +1,4 @@
-package org.example.objects;
+package org.example.objects.vehicle;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -16,7 +16,6 @@ public abstract class Vehicle {
     private BigDecimal value;
     private BigDecimal rentalCost;
     private BigDecimal insurance;
-    private BigDecimal initialInsurance;
     private boolean modified = false;
 
     public abstract void setDiscountRentalCost();

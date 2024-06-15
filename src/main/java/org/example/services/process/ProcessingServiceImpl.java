@@ -1,18 +1,17 @@
-package org.example.services;
+package org.example.services.process;
 
-import org.example.objects.*;
+import org.example.objects.output.RentAndInsurance;
+import org.example.objects.vehicle.Car;
+import org.example.objects.vehicle.CargoVan;
+import org.example.objects.vehicle.Motorcycle;
+import org.example.objects.vehicle.Vehicle;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.Scanner;
 
-import static org.example.constants.Errors.INVALID_DATE_FORMAT_MESSAGE;
-import static org.example.constants.Messages.*;
 
 public class ProcessingServiceImpl implements ProcessingService{
-
 
     @Override
     public Vehicle createVehicle(String type, String brand, String model, BigDecimal value, int factor) {
@@ -63,45 +62,6 @@ public class ProcessingServiceImpl implements ProcessingService{
     }
 
     @Override
-    public void setDatesViaInput(boolean inputState, String startDateInput, LocalDate startDate, String endDateInput,
-                                 LocalDate endDate, String returnDateInput, LocalDate returnDate) {
-        Scanner scanner = new Scanner(System.in);
-        System.out.println(STARTING_RENT_DAY_MESSAGE);
-        while (!inputState) {
-            try {
-                startDateInput = scanner.nextLine();
-                startDate = LocalDate.parse(startDateInput, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
-                inputState = true;
-            } catch (Exception exception) {
-                System.out.println(INVALID_DATE_FORMAT_MESSAGE);
-            }
-        }
-
-        System.out.println(ENDING_RENT_DAY_MESSAGE);
-        while (inputState) {
-            try {
-                endDateInput = scanner.nextLine();
-                endDate = LocalDate.parse(endDateInput, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
-                inputState = false;
-            } catch (Exception exception) {
-                System.out.println(INVALID_DATE_FORMAT_MESSAGE);
-            }
-        }
-
-        System.out.println(ACTUAL_RETURN_DAY_MESSAGE);
-        while (!inputState) {
-            try {
-                returnDateInput = scanner.nextLine();
-                returnDate = LocalDate.parse(returnDateInput, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
-                inputState = true;
-            } catch (Exception exception) {
-                System.out.println(INVALID_DATE_FORMAT_MESSAGE);
-            }
-        }
-        scanner.close();
-    }
-
-    @Override
     public void checkForRentalDiscount(long daysRentedFor, Vehicle vehicle) {
         if (daysRentedFor > 7L) {
             vehicle.setDiscountRentalCost();
@@ -128,6 +88,8 @@ public class ProcessingServiceImpl implements ProcessingService{
                 break;
         }
     }
+
+
 
 
 }

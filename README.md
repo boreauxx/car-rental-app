@@ -16,9 +16,9 @@ brand and model are optional but **value** is crucial for the business logic.
  - **cargo van** - what is your driver experience, in years (3years, etc.), if you have more than 5 years you will receive preferable insurance
 
 4. Information about the renting period 
- - **start date** -> when did you rent the vehicle
- - **end date** -> until when did you rent the vehicle
- - **return date** -> when did you return the vehicle
+ - **start date** - when did you rent the vehicle
+ - **end date** - until when did you rent the vehicle
+ - **return date** - when did you return the vehicle
 
 5. Keep in mind the following things:
  - the date format is dd/MM/yyyy (03/06/2024)
@@ -29,15 +29,17 @@ brand and model are optional but **value** is crucial for the business logic.
 
 ## Objects Folder
 the `objects` folder contains:
- - abstract **vehicle** class used for every vehicle instance
+ - the `vehicle` class, abstract, used for every vehicle instance
  - to add a new vehicle simply created it, add deisred new fields and extends Vehicle
  - the **invoice** class is used for the output via its `format()` method
+ - the **rentAndInsurance** class is used for easier storing of the values
 
 ## Services Folder 
 the `services` folder contains:
  - all the business logic
  - interaface and its implementation similar to a service bean in a RESTful API
- - methods for creating a vehicle, calucating its rent and insurance, setting values based on input, checking for discounts, formatting
+ - `processing service` with methods for creating a vehicle, calucating its rent and insurance, setting values based on input, checking for discounts, formatting
+ - additional `input service` to handle all user inputs and verify them separetly to keep the main file clean
 
 ## Constants Folder
 the `constants` folder contains:
