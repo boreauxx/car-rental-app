@@ -11,6 +11,7 @@ public interface ProcessingService {
     Vehicle createVehicle(String type, String brand, String model, BigDecimal value, int factor);
     RentAndInsurance calculateRentAndInsurance(long discountedDays, long daysRentedFor, BigDecimal rentalCost, BigDecimal insurance);
     void chooseMessageViaVehicleType(String vehicleType, String invalidSafetyRatingMessage, String invalidAgeMessage, String invalidExperienceMessage);
+    void setDatesViaInput(boolean inputState, String startDateInput, LocalDate startDate, String endDateInput, LocalDate endDate, String returnDateInput, LocalDate returnDate);
     void checkForRentalDiscount(long daysRentedFor, Vehicle vehicle);
     void checkForFactorDiscountOrSurcharge(String vehicleType,int discountOrSurchargeElement, Vehicle vehicle);
 

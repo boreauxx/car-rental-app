@@ -8,34 +8,16 @@ import org.example.services.ProcessingServiceImpl;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Scanner;
 
+import static org.example.constants.Errors.*;
+import static org.example.constants.Messages.*;
+
 public class Main {
 
     private static final List<String> ALLOWED_VEHICLES = List.of("car", "motorcycle", "cargo van");
-    private static final String CUSTOMER_NAME_MESSAGE = "Hello! Please enter your name:";
-    private static final String CHOOSE_VEHICLE_TYPE_MESSAGE = "Please choose one of the following options: car, motorcycle, cargo van";
-    private static final String CHOOSE_BRAND_MESSAGE = "Please submit the brand:";
-    private static final String CHOOSE_MODEL_MESSAGE = "Please submit the model:";
-    private static final String CHOOSE_VALUE_MESSAGE = "Please submit the value of the vehicle:";
-
-    private static final String CHOOSE_CAR_SAFETY_MESSAGE = "Please submit the car's safety range";
-    private static final String CHOOSE_AGE_MESSAGE = "Please submit your age:";
-    private static final String CHOOSE_EXPERIENCE_MESSAGE = "Please submit your driver's experience";
-
-    private static final String STARTING_RENT_DAY_MESSAGE = "Please enter the rent starting day in the format - dd/mm/yyyy:";
-    private static final String ENDING_RENT_DAY_MESSAGE = "Please enter the rent ending day in the format - dd/mm/yyyy:";
-    private static final String ACTUAL_RETURN_DAY_MESSAGE = "Please enter the day you returned the vehicle in the format - dd/mm/yyyy:";
-
-    private static final String INVALID_TYPE = "Please choose a valid vehicle type! ";
-    private static final String INVALID_VALUE_MESSAGE = "Please enter the sum in the following format - 5,000/20,000/35,000";
-    private static final String INVALID_SAFETY_RATING_MESSAGE = "Please submit a valid rating, 1 to 5 included!";
-    private static final String INVALID_AGE_MESSAGE = "Please submit a valid age! 18+";
-    private static final String INVALID_EXPERIENCE_MESSAGE = "Please submit valid experience in years!";
-    private static final String INVALID_DATE_FORMAT_MESSAGE = "Please submit a valid date in the format - dd/mm/yyyy";
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
@@ -55,7 +37,6 @@ public class Main {
         LocalDate returnDate = LocalDate.now();
         boolean running = true;
         boolean inputState = false;
-
 
         while (running) {
             System.out.println(CUSTOMER_NAME_MESSAGE);
@@ -87,7 +68,6 @@ public class Main {
                 }
             }
 
-
             while (inputState) {
                 try {
                     processingService.chooseMessageViaVehicleType(vehicleType, CHOOSE_CAR_SAFETY_MESSAGE, CHOOSE_AGE_MESSAGE, CHOOSE_EXPERIENCE_MESSAGE);
@@ -100,42 +80,7 @@ public class Main {
 
             Vehicle vehicle = processingService.createVehicle(vehicleType, brand, model, value, discountOrSurchargeElement);
 
-            System.out.println(STARTING_RENT_DAY_MESSAGE);
-
-            while (!inputState) {
-                try {
-                    startDateInput = scanner.nextLine();
-                    startDate = LocalDate.parse(startDateInput, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
-                    inputState = true;
-                } catch (Exception exception) {
-                    System.out.println(INVALID_DATE_FORMAT_MESSAGE);
-                }
-            }
-            System.out.println(ENDING_RENT_DAY_MESSAGE);
-
-
-            while (inputState) {
-                try {
-                    endDateInput = scanner.nextLine();
-                    endDate = LocalDate.parse(endDateInput, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
-                    inputState = false;
-                } catch (Exception exception) {
-                    System.out.println(INVALID_DATE_FORMAT_MESSAGE);
-                }
-            }
-
-            System.out.println(ACTUAL_RETURN_DAY_MESSAGE);
-
-
-            while (!inputState) {
-                try {
-                    returnDateInput = scanner.nextLine();
-                    returnDate = LocalDate.parse(returnDateInput, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
-                    inputState = true;
-                } catch (Exception exception) {
-                    System.out.println(INVALID_DATE_FORMAT_MESSAGE);
-                }
-            }
+            processingService.setDatesViaInput(false, startDateInput, startDate, endDateInput, endDate, returnDateInput, returnDate);
 
             long daysRentedFor = ChronoUnit.DAYS.between(startDate, endDate);
 

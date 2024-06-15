@@ -9,30 +9,12 @@ import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
+import static org.example.constants.InvoiceMessages.*;
+
 @Getter
 @Setter
 @AllArgsConstructor
 public class Invoice {
-
-    private static final String LAYOUT = "XXXXXXXXXX";
-    private static final String START_DATE_MESSAGE = "Reservation start date: ";
-    private static final String END_DATE_MESSAGE = "Reservation end date: ";
-    private static final String RESERVED_RENTAL_DAYS_MESSAGE = "Reserved rental days: ";
-    private static final String ACTUAL_RETURN_DATE_MESSAGE = "Actual return date: ";
-    private static final String ACTUAL_RENTAL_DAYS_MESSAGE = "Actual rental days: ";
-
-    private static final String RENTAL_COST_PER_DAY_MESSAGE = "Rental cost per day: $";
-    private static final String INSURANCE_PER_DAY_MESSAGE = "Insurance per day: $";
-    private static final String SAVED_RENT_MESSAGE = "Early return discount for rent: $";
-    private static final String SAVED_INSURANCE_MESSAGE = "Early return discount for insurance: $";
-
-    private static final String INITIAL_INSURANCE_PER_DAY_MESSAGE = "Initial insurance per day: $";
-    private static final String SURCHARGE_PER_DAY_MESSAGE = "Insurance addition pay per day: $";
-    private static final String DISCOUNT_PER_DAY_MESSAGE = "Insurance discount per day: $";
-
-    private static final String TOTAL_RENT_MESSAGE = "Total rent: $";
-    private static final String TOTAL_INSURANCE_MESSAGE = "Total insurance: $";
-    private static final String TOTAL_MESSAGE = "Total: $";
 
     private String customerName;
     private Vehicle vehicle;

@@ -4,16 +4,14 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
+
+import static org.example.constants.VehicleInformation.*;
 
 @Getter
 @Setter
 public class Motorcycle extends Vehicle {
 
-    private static final double MOTORCYCLE_RENTAL_PRICE = 15.00;
-    private static final double MOTORCYCLE_RENTAL_PRICE_DISCOUNTED = 10.00;
-    private static final double MOTORCYCLE_INSURANCE = 0.0002;
-    private static final double MOTORCYCLE_INSURANCE_SURCHARGE = 0.20;
+
 
     private int ageLimit;
 
