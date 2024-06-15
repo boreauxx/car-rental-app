@@ -19,12 +19,13 @@ public class Motorcycle extends Vehicle {
 
     public Motorcycle(String brand, String model, BigDecimal value, int ageLimit) {
         super(brand, model, value, BigDecimal.valueOf(MOTORCYCLE_RENTAL_PRICE),
+                value.multiply(BigDecimal.valueOf(MOTORCYCLE_INSURANCE)),
                 value.multiply(BigDecimal.valueOf(MOTORCYCLE_INSURANCE)), false);
         this.ageLimit = ageLimit;
     }
 
     public BigDecimal getInitInsurance(){
-        return getValue().multiply(BigDecimal.valueOf(MOTORCYCLE_INSURANCE)).setScale(1, RoundingMode.HALF_UP);
+        return getValue().multiply(BigDecimal.valueOf(MOTORCYCLE_INSURANCE));
     }
 
     public void setDiscountRentalCost() {
@@ -37,6 +38,6 @@ public class Motorcycle extends Vehicle {
     }
 
     public BigDecimal getInsuranceModifier(){
-        return getInsurance().multiply(BigDecimal.valueOf(MOTORCYCLE_INSURANCE_SURCHARGE)).setScale(1, RoundingMode.HALF_UP);
+        return getInitialInsurance().multiply(BigDecimal.valueOf(MOTORCYCLE_INSURANCE_SURCHARGE));
     }
 }

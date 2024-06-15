@@ -19,12 +19,13 @@ public class Car extends Vehicle {
 
     public Car(String brand, String model, BigDecimal value, int safetyRating) {
         super(brand, model, value, BigDecimal.valueOf(CAR_RENTAL_PRICE),
+                value.multiply(BigDecimal.valueOf(CAR_INSURANCE)),
                 value.multiply(BigDecimal.valueOf(CAR_INSURANCE)), false);
         this.safetyRating = safetyRating;
     }
 
     public BigDecimal getInitInsurance() {
-        return getValue().multiply(BigDecimal.valueOf(CAR_INSURANCE)).setScale(1, RoundingMode.HALF_UP);
+        return getValue().multiply(BigDecimal.valueOf(CAR_INSURANCE));
     }
 
     public void setDiscountRentalCost() {
@@ -37,7 +38,7 @@ public class Car extends Vehicle {
     }
 
     public BigDecimal getInsuranceModifier() {
-        return getInsurance().multiply(BigDecimal.valueOf(CAR_INSURANCE_DISCOUNT)).setScale(1, RoundingMode.HALF_UP);
+        return getInitialInsurance().multiply(BigDecimal.valueOf(CAR_INSURANCE_DISCOUNT));
     }
 
 }

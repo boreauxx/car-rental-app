@@ -107,7 +107,8 @@ public class Invoice {
             stringBuilder
                     .append(SAVED_RENT_MESSAGE).append(this.rentAndInsurance.getDiscountedRent().setScale(2, RoundingMode.HALF_UP))
                     .append(System.lineSeparator())
-                    .append(SAVED_INSURANCE_MESSAGE).append(this.rentAndInsurance.getFullyChargedInsurance().divide(BigDecimal.valueOf(2), RoundingMode.HALF_UP))
+                    .append(SAVED_INSURANCE_MESSAGE).append(this.rentAndInsurance.getFullyChargedInsurance().divide(BigDecimal.valueOf(2), RoundingMode.HALF_UP)
+                            .setScale(2, RoundingMode.HALF_UP))
                     .append(System.lineSeparator());
         }
 

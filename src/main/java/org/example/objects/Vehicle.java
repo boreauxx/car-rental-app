@@ -2,14 +2,12 @@ package org.example.objects;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
 
 @Getter
 @Setter
-@NoArgsConstructor
 @AllArgsConstructor
 public abstract class Vehicle {
 
@@ -18,6 +16,7 @@ public abstract class Vehicle {
     private BigDecimal value;
     private BigDecimal rentalCost;
     private BigDecimal insurance;
+    private BigDecimal initialInsurance;
     private boolean modified = false;
 
     public abstract void setDiscountRentalCost();
@@ -27,4 +26,5 @@ public abstract class Vehicle {
     public abstract void setModifiedInsurance();
 
     public abstract BigDecimal getInsuranceModifier();
+
 }

@@ -19,12 +19,13 @@ public class CargoVan extends Vehicle {
 
     public CargoVan(String brand, String model, BigDecimal value, int experience) {
         super(brand, model, value, BigDecimal.valueOf(CARGO_VAN_RENTAL_PRICE),
-                value.multiply(BigDecimal.valueOf(CARGO_VAN_INSURANCE)).setScale(1, RoundingMode.HALF_UP), false);
+                value.multiply(BigDecimal.valueOf(CARGO_VAN_INSURANCE)),
+                value.multiply(BigDecimal.valueOf(CARGO_VAN_INSURANCE)), false);
         this.experience = experience;
     }
 
     public BigDecimal getInitInsurance(){
-        return getValue().multiply(BigDecimal.valueOf(CARGO_VAN_INSURANCE)).setScale(1, RoundingMode.HALF_UP);
+        return getValue().multiply(BigDecimal.valueOf(CARGO_VAN_INSURANCE));
     }
 
     public void setDiscountRentalCost() {
@@ -37,6 +38,6 @@ public class CargoVan extends Vehicle {
     }
 
     public BigDecimal getInsuranceModifier(){
-        return getInsurance().multiply(BigDecimal.valueOf(CARGO_VAN_INSURANCE_DISCOUNT)).setScale(1, RoundingMode.HALF_UP);
+        return getInitialInsurance().multiply(BigDecimal.valueOf(CARGO_VAN_INSURANCE_DISCOUNT));
     }
 }

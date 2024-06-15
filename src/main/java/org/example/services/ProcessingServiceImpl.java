@@ -5,6 +5,7 @@ import org.example.objects.*;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 public class ProcessingServiceImpl implements ProcessingService{
 
@@ -54,27 +55,6 @@ public class ProcessingServiceImpl implements ProcessingService{
                 System.out.println(invalidExperienceMessage);
                 break;
         }
-    }
-
-    @Override
-    public boolean validateEndAndReturnDates(LocalDate startDate, LocalDate endDate, String endDateInput) {
-        // EXP: End and return dates cannot be before start date
-        if(!endDate.isBefore(startDate)){
-            String[] parts = endDateInput.split("/");
-            if (parts.length != 3) return false;
-            try {
-                int day = Integer.parseInt(parts[0]);
-                int month = Integer.parseInt(parts[1]);
-                int year = Integer.parseInt(parts[2]);
-                // EXP: A days must be between 1 or 31 days included, a month between 1 to 12 included, and the year has to be 2000 to 2099 included
-                if (day < 1 || day > 31) return false;
-                if (month < 1 || month > 12) return false;
-                return year >= 2000 && year <= 2099;
-            } catch (NumberFormatException e) {
-                return false;
-            }
-        }
-        return false;
     }
 
     @Override
