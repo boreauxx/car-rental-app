@@ -26,3 +26,21 @@ brand and model are optional but **value** is crucial for the business logic.
  - if you've returned the vehicle early you'll received less rental cost per day for the remaining days and no insurance
 
 6. After you've completed filling the information you'll receive and **Invoice** having all the information you need formatted in a readable and fashionable way.
+
+## Objects Folder
+the `objects` folder contains:
+ - abstract **vehicle** class used for every vehicle instance
+ - to add a new vehicle simply created it, add deisred new fields and extends Vehicle
+ - the **invoice** class is used for the output via its `format()` method
+
+## Services Folder 
+the `services` folder contains:
+ - all the business logic
+ - interaface and its implementation similar to a service bean in a RESTful API
+ - methods for creating a vehicle, calucating its rent and insurance, setting values based on input, checking for discounts, formatting
+
+## Constants Folder
+the `constants` folder contains:
+ - all messages, errors and static values for objects
+ - inside you can see the numbers used for the business logic 
+ - insurace based on vehicle, surcharge or discount based on vehicle specific factor, etc..
